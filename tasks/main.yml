@@ -1,0 +1,26 @@
+---
+- name: Install Nginx with updating local package index
+  become: true
+  become_user: root
+  apt: name=nginx state=installed update_cache=true
+  notify:
+    - Restart Nginx
+
+- name: Install Java7
+  become: true
+  become_user: root
+  apt: name=openjdk-7-jdk state=installed update_cache=true
+
+- name: Add the key and source list to apt for Jenkins
+  shell: wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+
+- name: Update cache of apt for refreshing the OS repository for latest packages
+  shell: sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+- name: After updating the system, install Jenkins
+  become: true
+  become_user: root
+  apt: name=jenkins state=installed update_cache=true
+  notify:
+    - Restart Jenkins
+
